@@ -118,10 +118,11 @@ void printPath(pair<int,int> exitcell,
 // Add arguments, return type, and logic
 // ----------------------------------------------------------
 
-bool dfs(int entRow, int entCol, vector<vector<int>> maze, vector<vector<bool>> visited,
-    vector<vector<int>> parentRow, vector<vector<int>> parentCol, int exitRow, int exitCol) {
+bool dfs(int entRow, int entCol, vector<vector<int>>& maze, vector<vector<bool>>& visited,
+    vector<vector<int>>& parentRow, vector<vector<int>>& parentCol, int exitRow, int exitCol) {
 //     // Your code here
 
+    // debug statement:
     //out of bounds check
     if (entRow > maze.size() || entCol > maze[0].size() || entRow < 0 || entCol < 0) {
         return false;
@@ -135,11 +136,31 @@ bool dfs(int entRow, int entCol, vector<vector<int>> maze, vector<vector<bool>> 
     // mark current node as visited
     visited[entRow][entCol] = true;
 
-    // TO DO: check if exit
+    // check if current node is the exit node
+    if (entRow == exitRow && entCol == exitCol) {
+        return true;
+    }
 
     // TO DO: implement directional arrays to check neighbors
     // use for loop ?
     // implement recursion
+
+    for (int i = 0; i < 4; i++) {
+
+        // neighbor rows and cols
+        int nr = entRow + dr[i];
+        int nc = entCol + dc[i];
+
+        // checks if dfs of the neighbor is true
+        if (dfs(nr, nc, maze, visited, parentRow, parentCol, exitRow, exitCol)) {
+            parentRow[nr][nc] = entRow;
+            parentCol[nr][nc] = entCol;
+
+            return true;
+        }
+    }
+
+    return false;
 
 }
 
@@ -156,18 +177,21 @@ int main() {
     vector<vector<int>> maze(N, vector<int>(M));
     generateMaze(maze, N, M);
 
+    //debug
+    cout<< "maze generated successfully";
+
     // Pick entrance and exit
     pair<int,int> entrance = chooseBoundaryCell(maze);
-    pair<int,int> exitcell = chooseBoundaryCell(maze);
+    pair<int,int> exitCell = chooseBoundaryCell(maze);
 
-    while (exitcell == entrance) {
-        exitcell = chooseBoundaryCell(maze);
+    while (exitCell == entrance) {
+        exitCell = chooseBoundaryCell(maze);
     }
 
     int ent_r = entrance.first;
     int ent_c = entrance.second;
-    int exit_r = exitcell.first;
-    int exit_c = exitcell.second;
+    int exit_r = exitCell.first;
+    int exit_c = exitCell.second;
 
     // Display the maze
     printMaze(maze, ent_r, ent_c, exit_r, exit_c);
@@ -181,16 +205,19 @@ int main() {
     // STUDENT WORK:
     // Call your DFS, track visited, and fill parent_r and parent_c
     // ------------------------------------------------------
+    // debug:
+    // cout << "calling dfs";
     bool found = dfs(ent_r, ent_c, maze, visited, parent_r, parent_c, exit_r, exit_c);
-
+    // debug:
+    //cout << "dfs called.";
     // ------------------------------------------------------
     // STUDENT WORK:
     // If found, print the path
     // ------------------------------------------------------
-    if (found) {
-         printPath(exitcell, parent_r, parent_c, ent_r, ent_c);
+    if (found == true) {
+         printPath(exitCell, parent_r, parent_c, ent_r, ent_c);
     } else {
-         cout << "\nNo path exists.\n";
+         cout<< "\nNo path exists.\n";
     }
 
     return 0;
