@@ -1,7 +1,3 @@
-//
-// Created by Manju Muralidharan on 11/22/25.
-//
-
 #include <iostream>
 #include <vector>
 #include <cstdlib>
@@ -120,11 +116,10 @@ void printPath(pair<int,int> exitcell,
 
 bool dfs(int entRow, int entCol, vector<vector<int>>& maze, vector<vector<bool>>& visited,
     vector<vector<int>>& parentRow, vector<vector<int>>& parentCol, int exitRow, int exitCol) {
-//     // Your code here
 
     // debug statement:
     //out of bounds check
-    if (entRow > maze.size() || entCol > maze[0].size() || entRow < 0 || entCol < 0) {
+    if (entRow >= maze.size() || entCol >= maze[0].size() || entRow < 0 || entCol < 0) {
         return false;
     }
 
@@ -141,21 +136,28 @@ bool dfs(int entRow, int entCol, vector<vector<int>>& maze, vector<vector<bool>>
         return true;
     }
 
-    // TO DO: implement directional arrays to check neighbors
-    // use for loop ?
-    // implement recursion
-
+    // i represents the index of the directional arrays
     for (int i = 0; i < 4; i++) {
 
-        // neighbor rows and cols
+        // declare neighbor rows and cols
+        // set neighbors to curr row/cols neighboring row/col depending on index of directional array
         int nr = entRow + dr[i];
         int nc = entCol + dc[i];
 
-        // checks if dfs of the neighbor is true
-        if (dfs(nr, nc, maze, visited, parentRow, parentCol, exitRow, exitCol)) {
-            parentRow[nr][nc] = entRow;
-            parentCol[nr][nc] = entCol;
+        // catch out of bounds, if node is previously visited, and if node is a wall:
+        if (nr >= maze.size() || nc >= maze[0].size() || nr < 0 || nc < 0) {
+            continue;
+        }
+        if (maze[nr][nc] == 1 || visited[nr][nc] == true) {
+            continue;
+        }
 
+        // assign parent row and column
+        parentRow[nr][nc] = entRow;
+        parentCol[nr][nc] = entCol;
+
+        // recursive statement to check neighbor
+        if (dfs(nr, nc, maze, visited, parentRow, parentCol, exitRow, exitCol)) {
             return true;
         }
     }
@@ -178,7 +180,7 @@ int main() {
     generateMaze(maze, N, M);
 
     //debug
-    cout<< "maze generated successfully";
+    // cout<< "maze generated successfully";
 
     // Pick entrance and exit
     pair<int,int> entrance = chooseBoundaryCell(maze);
